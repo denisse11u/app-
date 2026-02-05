@@ -25,8 +25,30 @@ class Userstorage {
     return pin != null;
   }
 
+  
+
   Future<void> deletePin() async {
     //borrar
     await storage.delete(key: 'user_pin');
+  }
+
+
+
+  Future<void> saveWord(String word) async {
+    await storage.write(
+      key: 'user_word',
+      value: word,
+    ); // se pone key userpin para indentificar ese dato en la memoria, y en value llama a la funcion del paramenteo
+  }
+
+  Future<String?> getWord() async {
+    //ver cual pin fue el guardado
+    return await storage.read(key: 'user_word');
+  }
+
+  //para saber si existe un pin
+  Future<bool> hasWord() async {
+    final word = await getWord();
+    return word != null;
   }
 }

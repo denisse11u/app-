@@ -1,3 +1,4 @@
+import 'package:app/modules/authenticate/recovery_password/widget/reset_password.dart';
 import 'package:app/modules/home/page/home_page.dart';
 import 'package:app/shared/helpers/global_helper.dart';
 import 'package:app/shared/storage/user_storage.dart';
@@ -46,11 +47,17 @@ class _LoginPinFormState extends State<LoginPinForm> {
       if (value == firstPin) {
         await storage.savePin(value);
         GlobalHelper.showSuccess(context, "pin creado");
+          // Navigator.pushReplacement(
+          //           context,
+          //           MaterialPageRoute(builder: (_) => const ResetPassword()),
+          //         );
+
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (_) => const HomePage()),
         );
-      } else {
+      } 
+      else {
         GlobalHelper.showError(context, "no coincide con el pin creado");
         controller.clear();
         setState(() => mode = PinMode.create);
@@ -72,6 +79,8 @@ class _LoginPinFormState extends State<LoginPinForm> {
       }
     }
   }
+
+
 
   String get title {
     switch (mode) {
@@ -117,8 +126,18 @@ class _LoginPinFormState extends State<LoginPinForm> {
             ),
 
             onCompleted: createPin,
+            
           ),
+          
         ),
+        TextButton(onPressed: (){
+          Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const ResetPassword(),
+                      ),
+                    );
+        }, child: Text('olvide mi contraseña'))
       ],
     );
   }
