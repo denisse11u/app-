@@ -6,17 +6,35 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: const LoginPinForm()),
-        //   child: Column(
-        //     mainAxisAlignment: MainAxisAlignment.center,
-        //     children: [const LoginPinForm(), ResetPassword()], //resetpassword()
+    // final titulocrear = Provider.of<UserProvider>(context);
 
-            
-        //   ),
-        // ),
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TextButton(
+              onPressed: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LoginPinForm()),
+                );
+              },
+              child: Text('Crear Pin'),
+              // SafeArea(
+
+              //   child: Center(
+
+              //     child: const LoginPinForm()),
+              //   //   child: Column(
+              //   //     mainAxisAlignment: MainAxisAlignment.center,
+              //   //     children: [const LoginPinForm(), ResetPassword()], //resetpassword()
+
+              //   //   ),
+              //   // ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -47,17 +47,12 @@ class _LoginPinFormState extends State<LoginPinForm> {
       if (value == firstPin) {
         await storage.savePin(value);
         GlobalHelper.showSuccess(context, "pin creado");
-          // Navigator.pushReplacement(
-          //           context,
-          //           MaterialPageRoute(builder: (_) => const ResetPassword()),
-          //         );
 
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (_) => const HomePage()),
         );
-      } 
-      else {
+      } else {
         GlobalHelper.showError(context, "no coincide con el pin creado");
         controller.clear();
         setState(() => mode = PinMode.create);
@@ -80,65 +75,62 @@ class _LoginPinFormState extends State<LoginPinForm> {
     }
   }
 
-
-
-  String get title {
-    switch (mode) {
-      case PinMode.create:
-        return "Crea tu PIN";
-      case PinMode.confirm:
-        return "Confirma tu PIN";
-      case PinMode.enter:
-        return "Ingresa tu PIN";
-    }
-  }
+  String get title => switch (mode) {
+    PinMode.create => "Crea tu PIN",
+    PinMode.confirm => "Confirma tu PIN",
+    PinMode.enter => "Ingresa tu PIN",
+  };
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        const Icon(Icons.lock, size: 60, color: Colors.blue),
-        const SizedBox(height: 20),
-        Text(
-          title,
-          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
+    return Scaffold(
+      body: Container(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.lock, size: 60, color: Colors.blue),
+            const SizedBox(height: 20),
 
-        const SizedBox(height: 40),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 40),
-          child: PinCodeTextField(
-            controller: controller,
-            appContext: context,
-            length: 4,
-            obscureText: true,
-            keyboardType: TextInputType.number,
-            animationType: AnimationType.fade,
+            // Text(
+            //   // title,
+            //   style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            // ),
+            const SizedBox(height: 40),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 40),
 
-            pinTheme: PinTheme(
-              shape: PinCodeFieldShape.box,
-              borderRadius: BorderRadius.circular(10),
-              fieldHeight: 60,
-              fieldWidth: 60,
-              selectedColor: Colors.blue,
-              inactiveColor: Colors.grey,
+              child: PinCodeTextField(
+                controller: controller,
+                appContext: context,
+                length: 4,
+                obscureText: true,
+                keyboardType: TextInputType.number,
+                animationType: AnimationType.fade,
+
+                pinTheme: PinTheme(
+                  shape: PinCodeFieldShape.box,
+                  borderRadius: BorderRadius.circular(10),
+                  fieldHeight: 60,
+                  fieldWidth: 60,
+                  selectedColor: Colors.blue,
+                  inactiveColor: Colors.grey,
+                ),
+
+                onCompleted: createPin,
+              ),
             ),
-
-            onCompleted: createPin,
-            
-          ),
-          
+            TextButton(
+              onPressed: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ResetPassword()),
+                );
+              },
+              child: Text('Olvidé mi contraseña'),
+            ),
+          ],
         ),
-        TextButton(onPressed: (){
-          Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const ResetPassword(),
-                      ),
-                    );
-        }, child: Text('olvide mi contraseña'))
-      ],
+      ),
     );
   }
 }

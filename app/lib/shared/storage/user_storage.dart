@@ -25,14 +25,16 @@ class Userstorage {
     return pin != null;
   }
 
-  
-
   Future<void> deletePin() async {
     //borrar
     await storage.delete(key: 'user_pin');
   }
 
-
+  //para saber si existe una palabra
+  Future<bool> hasWord() async {
+    final word = await getWord();
+    return word != null;
+  }
 
   Future<void> saveWord(String word) async {
     await storage.write(
@@ -42,13 +44,7 @@ class Userstorage {
   }
 
   Future<String?> getWord() async {
-    //ver cual pin fue el guardado
+    //ver cual palabra fue el guardado
     return await storage.read(key: 'user_word');
-  }
-
-  //para saber si existe un pin
-  Future<bool> hasWord() async {
-    final word = await getWord();
-    return word != null;
   }
 }
