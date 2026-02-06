@@ -99,56 +99,53 @@ class _LoginPinFormState extends State<LoginPinForm> {
             const SizedBox(height: 40),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 40),
-              child: widget.islogin
-                  ? PinCodeTextField(
-                      controller: controller,
-                      appContext: context,
-                      length: 4,
-                      obscureText: true,
-                      keyboardType: TextInputType.number,
-                      animationType: AnimationType.fade,
+              child: PinCodeTextField(
+                controller: controller,
+                appContext: context,
+                length: 4,
+                obscureText: true,
+                keyboardType: TextInputType.number,
+                animationType: AnimationType.fade,
 
-                      pinTheme: PinTheme(
-                        shape: PinCodeFieldShape.box,
-                        borderRadius: BorderRadius.circular(10),
-                        fieldHeight: 60,
-                        fieldWidth: 60,
-                        selectedColor: Colors.blue,
-                        inactiveColor: Colors.grey,
-                      ),
+                pinTheme: PinTheme(
+                  shape: PinCodeFieldShape.box,
+                  borderRadius: BorderRadius.circular(10),
+                  fieldHeight: 60,
+                  fieldWidth: 60,
+                  selectedColor: Colors.blue,
+                  inactiveColor: Colors.grey,
+                ),
 
-                      onCompleted: (value) {
-                        final savePin = storage.getPin();
-                        if (value == savePin) {
-                          if (!context.mounted) return;
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(builder: (_) => const HomePage()),
-                          );
-                        } else {
-                          // GlobalHelper.showError(context, "PIN incorrecto");
-                          // controller.clear();
-                          if (!context.mounted) return;
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const ResetPassword(),
-                            ),
-                          );
-                        }
-                      },
-                    )
-                  : TextButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const ResetPassword(),
-                          ),
-                        );
-                      },
-                      child: Text('Olvidé mi contraseña'),
-                    ),
+                onCompleted: (createPin) {
+                  final savePin = storage.savePin(createPin);
+                  if (createPin == savePin) {
+                    if (!context.mounted) return;
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (_) => const HomePage()),
+                    );
+                  } else {
+                    // GlobalHelper.showError(context, "PIN incorrecto");
+                    // controller.clear();
+                    if (!context.mounted) return;
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (_) => const ResetPassword()),
+                    );
+                  }
+                },
+              ),
+              // : TextButton(
+              //     onPressed: () {
+              //       Navigator.pushReplacement(
+              //         context,
+              //         MaterialPageRoute(
+              //           builder: (_) => const ResetPassword(),
+              //         ),
+              //       );
+              //     },
+              //     child: Text('Olvidé mi contraseña'),
+              //   ),
             ),
           ],
         ),
@@ -156,3 +153,23 @@ class _LoginPinFormState extends State<LoginPinForm> {
     );
   }
 }
+// onCompleted: (value) {
+//                         final savePin = storage.savePin(value);
+//                         if (value == savePin) {
+//                           if (!context.mounted) return;
+//                           Navigator.pushReplacement(
+//                             context,
+//                             MaterialPageRoute(builder: (_) => const HomePage()),
+//                           );
+//                         } else {
+//                           // GlobalHelper.showError(context, "PIN incorrecto");
+//                           // controller.clear();
+//                           if (!context.mounted) return;
+//                           Navigator.pushReplacement(
+//                             context,
+//                             MaterialPageRoute(
+//                               builder: (_) => const ResetPassword(),
+//                             ),
+//                           );
+//                         }
+//                       },

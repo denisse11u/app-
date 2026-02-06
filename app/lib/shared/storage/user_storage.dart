@@ -30,6 +30,10 @@ class Userstorage {
     await storage.delete(key: 'user_pin');
   }
 
+  //////////////////
+  ///
+  ///
+  ///
   //para saber si existe una palabra
   Future<bool> hasWord() async {
     final word = await getWord();

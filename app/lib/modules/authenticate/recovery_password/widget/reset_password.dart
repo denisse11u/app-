@@ -1,5 +1,6 @@
 import 'package:app/modules/authenticate/login/page/login_page.dart';
 import 'package:app/modules/authenticate/login/widget/login_pin_form.dart';
+import 'package:app/modules/home/page/home_page.dart';
 import 'package:app/shared/helpers/global_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:app/shared/storage/user_storage.dart';
@@ -61,12 +62,21 @@ class _ResetPasswordState extends State<ResetPassword> {
 
                       if (savedWord == null) {
                         if (!mounted) return;
-                        GlobalHelper.showError(
+                        Navigator.pushReplacement(
                           context,
-                          'No hay palabra registrada',
+                          MaterialPageRoute(builder: (_) => const HomePage()),
                         );
                         return;
                       }
+
+                      // if (savedWord == null) {
+                      //   if (!mounted) return;
+                      //   GlobalHelper.showError(
+                      //     context,
+                      //     'No hay palabra registrada',
+                      //   );
+                      //   return;
+                      // }
 
                       if (controller.text.trim() == savedWord) {
                         await storage.deletePin();

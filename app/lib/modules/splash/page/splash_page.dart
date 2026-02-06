@@ -39,7 +39,6 @@ class _SplashPageState extends State<SplashPage> {
             children: const [
               Icon(Icons.lock, size: 100, color: Colors.white),
               SizedBox(height: 20),
-
               CircularProgressIndicator(color: Colors.white),
             ],
           ),
