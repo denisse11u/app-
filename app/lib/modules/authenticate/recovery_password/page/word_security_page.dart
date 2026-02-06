@@ -1,3 +1,4 @@
+import 'package:app/modules/authenticate/recovery_password/widget/reset_password.dart';
 import 'package:flutter/material.dart';
 
 class WordSecurityPage extends StatelessWidget {
@@ -11,7 +12,10 @@ class WordSecurityPage extends StatelessWidget {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const ResetPassword()),
+            );
           },
         ),
       ),

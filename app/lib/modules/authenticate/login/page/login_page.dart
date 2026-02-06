@@ -7,6 +7,7 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // final titulocrear = Provider.of<UserProvider>(context);
+    // final bool isCreate;
 
     return Scaffold(
       body: Center(
@@ -17,7 +18,9 @@ class LoginPage extends StatelessWidget {
               onPressed: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (_) => const LoginPinForm()),
+                  MaterialPageRoute(
+                    builder: (_) => const LoginPinForm(islogin: false),
+                  ),
                 );
               },
               child: Text('Crear Pin'),

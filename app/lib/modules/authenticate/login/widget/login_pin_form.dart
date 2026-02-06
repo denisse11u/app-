@@ -8,8 +8,9 @@ import 'package:pin_code_fields/pin_code_fields.dart';
 enum PinMode { create, confirm, enter }
 
 class LoginPinForm extends StatefulWidget {
-  const LoginPinForm({super.key});
-
+  const LoginPinForm({super.key, required this.islogin});
+  //debes recibir un bool que te diga si es crear o ingresar pin
+  final bool islogin;
   @override
   State<LoginPinForm> createState() => _LoginPinFormState();
 }
@@ -98,35 +99,56 @@ class _LoginPinFormState extends State<LoginPinForm> {
             const SizedBox(height: 40),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 40),
+              child: widget.islogin
+                  ? PinCodeTextField(
+                      controller: controller,
+                      appContext: context,
+                      length: 4,
+                      obscureText: true,
+                      keyboardType: TextInputType.number,
+                      animationType: AnimationType.fade,
 
-              child: PinCodeTextField(
-                controller: controller,
-                appContext: context,
-                length: 4,
-                obscureText: true,
-                keyboardType: TextInputType.number,
-                animationType: AnimationType.fade,
+                      pinTheme: PinTheme(
+                        shape: PinCodeFieldShape.box,
+                        borderRadius: BorderRadius.circular(10),
+                        fieldHeight: 60,
+                        fieldWidth: 60,
+                        selectedColor: Colors.blue,
+                        inactiveColor: Colors.grey,
+                      ),
 
-                pinTheme: PinTheme(
-                  shape: PinCodeFieldShape.box,
-                  borderRadius: BorderRadius.circular(10),
-                  fieldHeight: 60,
-                  fieldWidth: 60,
-                  selectedColor: Colors.blue,
-                  inactiveColor: Colors.grey,
-                ),
-
-                onCompleted: createPin,
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (_) => const ResetPassword()),
-                );
-              },
-              child: Text('Olvidé mi contraseña'),
+                      onCompleted: (value) {
+                        final savePin = storage.getPin();
+                        if (value == savePin) {
+                          if (!context.mounted) return;
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (_) => const HomePage()),
+                          );
+                        } else {
+                          // GlobalHelper.showError(context, "PIN incorrecto");
+                          // controller.clear();
+                          if (!context.mounted) return;
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const ResetPassword(),
+                            ),
+                          );
+                        }
+                      },
+                    )
+                  : TextButton(
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const ResetPassword(),
+                          ),
+                        );
+                      },
+                      child: Text('Olvidé mi contraseña'),
+                    ),
             ),
           ],
         ),
