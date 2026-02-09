@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:logger/web.dart';
 
 class GlobalHelper {
   static ScaffoldFeatureController<SnackBar, SnackBarClosedReason> snackBar({
@@ -46,4 +47,14 @@ class GlobalHelper {
   static void dismissKeyboard(BuildContext context) {
     FocusScope.of(context).unfocus();
   }
+
+  static final logger = Logger(
+    printer: PrettyPrinter(
+      methodCount: 0,
+      errorMethodCount: 8,
+      lineLength: 120,
+      colors: true,
+      printEmojis: false,
+    ),
+  );
 }

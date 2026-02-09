@@ -19,11 +19,11 @@ class LoginPage extends StatelessWidget {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => const LoginPinForm(islogin: false),
+                    builder: (_) => const LoginPinForm(islogin: true),
                   ),
                 );
               },
-              child: Text('Crear Pin'),
+              child: Text('Ingresar Pin'),
               // SafeArea(
 
               //   child: Center(

@@ -1,3 +1,4 @@
+import 'package:app/modules/authenticate/login/page/login_page.dart';
 import 'package:app/modules/authenticate/recovery_password/widget/reset_password.dart';
 import 'package:app/modules/home/page/home_page.dart';
 import 'package:app/shared/helpers/global_helper.dart';
@@ -24,17 +25,18 @@ class _LoginPinFormState extends State<LoginPinForm> {
   @override
   void initState() {
     super.initState();
+    mode = widget.islogin ? PinMode.enter : PinMode.create;
     // storage.deletePin();
 
-    _pinExist();
+    // _pinExist();
   }
 
-  Future<void> _pinExist() async {
-    final hasPin = await storage.hasPin();
-    setState(() {
-      mode = hasPin ? PinMode.enter : PinMode.create;
-    });
-  }
+  // Future<void> _pinExist() async {
+  //   final hasPin = await storage.hasPin();
+  //   setState(() {
+  //     mode = hasPin ? PinMode.enter : PinMode.create;
+  //   });
+  // }
 
   Future<void> createPin(String value) async {
     if (mode == PinMode.create) {
@@ -92,10 +94,10 @@ class _LoginPinFormState extends State<LoginPinForm> {
             const Icon(Icons.lock, size: 60, color: Colors.blue),
             const SizedBox(height: 20),
 
-            // Text(
-            //   // title,
-            //   style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            // ),
+            Text(
+              title,
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 40),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 40),
@@ -115,26 +117,30 @@ class _LoginPinFormState extends State<LoginPinForm> {
                   selectedColor: Colors.blue,
                   inactiveColor: Colors.grey,
                 ),
-
-                onCompleted: (createPin) {
-                  final savePin = storage.savePin(createPin);
-                  if (createPin == savePin) {
-                    if (!context.mounted) return;
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (_) => const HomePage()),
-                    );
-                  } else {
-                    // GlobalHelper.showError(context, "PIN incorrecto");
-                    // controller.clear();
-                    if (!context.mounted) return;
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (_) => const ResetPassword()),
-                    );
-                  }
+                onCompleted: (value) async {
+                  await createPin(value);
                 },
+
+                // onCompleted: (createPin) {
+                //   final savePin = storage.savePin(createPin);
+                //   if (createPin == savePin) {
+                //     if (!context.mounted) return;
+                //     Navigator.pushReplacement(
+                //       context,
+                //       MaterialPageRoute(builder: (_) => const HomePage()),
+                //     );
+                //   } else {
+                //     // GlobalHelper.showError(context, "PIN incorrecto");
+                //     // controller.clear();
+                //     if (!context.mounted) return;
+                //     Navigator.pushReplacement(
+                //       context,
+                //       MaterialPageRoute(builder: (_) => const ResetPassword()),
+                //     );
+                //   }
+                // },
               ),
+
               // : TextButton(
               //     onPressed: () {
               //       Navigator.pushReplacement(
@@ -147,6 +153,16 @@ class _LoginPinFormState extends State<LoginPinForm> {
               //     child: Text('Olvidé mi contraseña'),
               //   ),
             ),
+            if (mode == PinMode.enter)
+              TextButton(
+                onPressed: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => const ResetPassword()),
+                  );
+                },
+                child: const Text('restablecer contraseña'),
+              ),
           ],
         ),
       ),

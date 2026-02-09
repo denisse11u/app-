@@ -51,4 +51,6 @@ class Userstorage {
     //ver cual palabra fue el guardado
     return await storage.read(key: 'user_word');
   }
+
+  Future<dynamic> getVersionApp() async {}
 }

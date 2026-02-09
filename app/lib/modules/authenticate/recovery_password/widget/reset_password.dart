@@ -67,7 +67,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                           MaterialPageRoute(builder: (_) => const HomePage()),
                         );
                         return;
-                      }
+                      } //
 
                       // if (savedWord == null) {
                       //   if (!mounted) return;
@@ -149,7 +149,7 @@ class _ResetPasswordState extends State<ResetPassword> {
   @override
   void initState() {
     super.initState();
-    _wordExist();
+    //_wordExist();
   }
 
   @override

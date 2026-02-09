@@ -1,35 +1,45 @@
 import 'package:app/modules/authenticate/login/page/login_page.dart';
 import 'package:app/modules/home/widget/create_data.dart';
+import 'package:app/modules/wordspace/wigdet/create_wordspace.dart';
+import 'package:app/shared/storage/user_storage.dart';
 import 'package:flutter/material.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  final storage = Userstorage();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Datos creados'),
+        title: Text('Baúl de Conexiones'),
         centerTitle: true,
         backgroundColor: Colors.blue,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.logout_outlined),
 
           onPressed: () => Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (_) => const LoginPage()),
           ),
         ),
-      ),
-
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => CreateData()),
-          );
-        },
-        child: Icon(Icons.add),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => CreateWordspace()),
+              );
+            },
+            icon: Icon(Icons.add_circle_outline_sharp),
+          ),
+        ],
       ),
 
       // body: Padding(
