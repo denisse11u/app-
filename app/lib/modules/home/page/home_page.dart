@@ -1,6 +1,9 @@
+import 'package:app/models/wordspace_model.dart';
 import 'package:app/modules/authenticate/login/page/login_page.dart';
+import 'package:app/modules/wordspace/page/wordspace_page.dart';
 import 'package:app/modules/wordspace/wigdet/create_wordspace.dart';
 import 'package:app/shared/storage/user_storage.dart';
+import 'package:app/shared/storage/wordspace_storage.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -11,8 +14,21 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  @override
+  void initState() {
+    super.initState();
+    loadData();
+  }
+
+  WordspaceModel? data;
+
   final storage = Userstorage();
   final searchController = TextEditingController();
+
+  Future<void> loadData() async {
+    data = await WordspaceStorage().getUserSpaceData();
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,37 +59,57 @@ class _HomePageState extends State<HomePage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: TextField(
-          controller: searchController,
-          style: const TextStyle(fontSize: 15),
-          decoration: InputDecoration(
-            hintText: 'Buscar',
-            hintStyle: TextStyle(color: Colors.grey[400]),
-            prefixIcon: const Icon(
-              Icons.search_rounded,
-              color: Color(0xFF667eea),
+        child: Column(
+          children: [
+            TextField(
+              controller: searchController,
+              style: const TextStyle(fontSize: 15),
+              decoration: InputDecoration(
+                hintText: 'Buscar',
+                hintStyle: TextStyle(color: Colors.grey[400]),
+                prefixIcon: const Icon(
+                  Icons.search_rounded,
+                  color: Color(0xFF667eea),
+                ),
+                suffixIcon: searchController.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear_rounded, size: 20),
+                        onPressed: () {
+                          setState(() {
+                            searchController.clear();
+                          });
+                        },
+                      )
+                    : null,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
+                ),
+                filled: true,
+                fillColor: Colors.white,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 16,
+                ),
+              ),
             ),
-            suffixIcon: searchController.text.isNotEmpty
-                ? IconButton(
-                    icon: const Icon(Icons.clear_rounded, size: 20),
-                    onPressed: () {
-                      setState(() {
-                        searchController.clear();
-                      });
-                    },
-                  )
-                : null,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide.none,
+            Expanded(
+              child: data == null
+                  ? const Center(child: Text("Sin datos"))
+                  : ListView(
+                      children: data!.credentials.map((c) {
+                        return Card(
+                          margin: const EdgeInsets.only(top: 12),
+                          child: ListTile(
+                            title: Text(c.name),
+                            subtitle: Text(c.user),
+                            // trailing: const Icon(Icons.lock),
+                          ),
+                        );
+                      }).toList(),
+                    ),
             ),
-            filled: true,
-            fillColor: Colors.white,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 20,
-              vertical: 16,
-            ),
-          ),
+          ],
         ),
       ),
 

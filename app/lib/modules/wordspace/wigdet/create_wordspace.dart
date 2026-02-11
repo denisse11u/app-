@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:app/models/wordspace_model.dart';
+import 'package:app/shared/storage/wordspace_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -13,6 +15,14 @@ class CreateWordspace extends StatefulWidget {
 class _CreateWordspaceState extends State<CreateWordspace> {
   File? image;
   final picker = ImagePicker();
+  final _formKey = GlobalKey<FormState>();
+
+  final name = TextEditingController();
+  final user = TextEditingController();
+  final email = TextEditingController();
+  final url = TextEditingController();
+  final pass = TextEditingController();
+  final notes = TextEditingController();
 
   Future<void> pickImage() async {
     final picked = await picker.pickImage(source: ImageSource.gallery);
@@ -27,7 +37,7 @@ class _CreateWordspaceState extends State<CreateWordspace> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("nuevo texto")),
+      appBar: AppBar(title: Text("Nueva Conexión")),
 
       body: SingleChildScrollView(
         child: Padding(
@@ -76,30 +86,90 @@ class _CreateWordspaceState extends State<CreateWordspace> {
                   ),
                 ],
               ),
+              Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    TextFormField(
+                      controller: name,
+                      decoration: InputDecoration(hintText: "Nombre"),
+                      validator: (v) => v!.isEmpty ? "Requerido" : null,
+                    ),
 
-              // TextButton(onPressed: pickImage, child: Text('data')),
+                    TextFormField(
+                      controller: user,
+                      decoration: InputDecoration(hintText: "Usuario"),
+                      validator: (v) => v!.isEmpty ? "Requerido" : null,
+                    ),
+
+                    TextFormField(
+                      controller: pass,
+                      decoration: InputDecoration(hintText: "Password"),
+                      validator: (v) => v!.isEmpty ? "Requerido" : null,
+                    ),
+                  ],
+                ),
+              ),
+
+              TextButton(onPressed: pickImage, child: Text('data')),
               SizedBox(height: 24),
 
-              TextField(decoration: InputDecoration(hintText: "Título")),
-              SizedBox(height: 24),
+              // TextField(decoration: InputDecoration(hintText: "Nombre")),
+              // SizedBox(height: 24),
 
-              TextField(decoration: InputDecoration(hintText: "Correo")),
-              SizedBox(height: 24),
+              // TextField(
+              //   controller: name,
+              //   decoration: InputDecoration(hintText: "Usuario"),
+              // ),
+              // SizedBox(height: 24),
 
-              TextField(decoration: InputDecoration(hintText: "URL")),
-              SizedBox(height: 24),
+              // TextField(
+              //   // textAlign: TextAlign.center,
+              //   // textInputAction: TextInputAction.none,
+              //   decoration: InputDecoration(
+              //     hintText: "Correo",
 
-              TextField(decoration: InputDecoration(hintText: "Password")),
+              //     border: OutlineInputBorder(
+              //       borderRadius: BorderRadius.circular(12),
+              //     ),
+              //   ),
+              // ),
+              // SizedBox(height: 24),
 
+              // TextField(decoration: InputDecoration(hintText: "URL")),
+              // SizedBox(height: 24),
+
+              // TextField(decoration: InputDecoration(hintText: "Password")),
               SizedBox(height: 24),
               TextField(
                 maxLines: 10,
-                decoration: InputDecoration(hintText: "Nota"),
+                decoration: InputDecoration(hintText: "Notas"),
               ),
               SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: () async {
+                  if (!_formKey.currentState!.validate()) return;
 
-              FloatingActionButton(onPressed: () => context),
-              Icon(Icons.abc_outlined),
+                  final storage = WordspaceStorage();
+                  final credential = Credential(
+                    name: name.text,
+                    user: user.text,
+                    password: pass.text,
+                    url: url.text,
+                    notes: notes.text,
+                  );
+                  final model = WordspaceModel(
+                    name: name.text,
+                    description: notes.text,
+                    credentials: [credential],
+                  );
+                  //para q guarde el storage y se dirija al home
+                  await WordspaceStorage().setUserSpaceData(model);
+
+                  Navigator.pop(context);
+                },
+                child: Text('data'),
+              ),
             ],
           ),
         ),
