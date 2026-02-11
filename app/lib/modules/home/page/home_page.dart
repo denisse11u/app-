@@ -47,7 +47,7 @@ class _HomePageState extends State<HomePage> {
           controller: searchController,
           style: const TextStyle(fontSize: 15),
           decoration: InputDecoration(
-            hintText: 'Buscar texto',
+            hintText: 'Buscar',
             hintStyle: TextStyle(color: Colors.grey[400]),
             prefixIcon: const Icon(
               Icons.search_rounded,
