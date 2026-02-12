@@ -6,6 +6,8 @@ WordspaceModel wordspaceModelFromJson(String str) =>
 String wordspaceModelToJson(WordspaceModel data) => json.encode(data.toJson());
 
 class WordspaceModel {
+  final int id;
+
   final String name;
   final String description;
   final List<Credential> credentials;
@@ -14,6 +16,7 @@ class WordspaceModel {
     required this.name,
     required this.description,
     required this.credentials,
+    required this.id,
   });
 
   factory WordspaceModel.fromJson(Map<String, dynamic> json) => WordspaceModel(
@@ -22,12 +25,14 @@ class WordspaceModel {
     credentials: List<Credential>.from(
       json["credentials"].map((x) => Credential.fromJson(x)),
     ),
+    id: json["id"],
   );
 
   Map<String, dynamic> toJson() => {
     "name": name,
     "description": description,
     "credentials": List<dynamic>.from(credentials.map((x) => x.toJson())),
+    "id": id,
   };
 }
 

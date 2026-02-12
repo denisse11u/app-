@@ -1,7 +1,5 @@
 import 'package:app/models/wordspace_model.dart';
 import 'package:app/modules/authenticate/login/page/login_page.dart';
-import 'package:app/modules/home/page/home_page.dart';
-import 'package:app/modules/wordspace/wigdet/create_data_wordspace.dart';
 import 'package:app/modules/wordspace/wigdet/create_name_wordspace.dart';
 import 'package:app/shared/storage/user_storage.dart';
 import 'package:app/shared/storage/wordspace_storage.dart';
@@ -26,7 +24,7 @@ class _WordspacePageState extends State<WordspacePage> {
 
   final storage = Userstorage();
   final searchController = TextEditingController();
-  bool isTitle = true;
+  bool isLoading = true;
   List<WordspaceModel> filterWordspaces = [];
 
   Future<void> loadData() async {
@@ -34,56 +32,31 @@ class _WordspacePageState extends State<WordspacePage> {
     setState(() {
       wordspace = wordspace;
       filterNote = wordspace?.credentials ?? [];
-      isTitle = false;
+      isLoading = false;
     });
-  }
-
-  Future<void> _isWordlist() async {
-    // final savePin = await storage.getPin();
-
-    final wordlist = await storage.hasWord();
-
-    if (!mounted) return;
-
-    if (wordlist) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const HomePage()),
-      );
-    } else {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const CreateDataWordspace()),
-      );
-    }
-
-    // Navigator.pushReplacement(
-    //   context,
-    //   MaterialPageRoute(builder: (_) => const HomePage()),
-    // );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Crear Baúl de Conexiones'),
+        title: Text('Baúl de Conexiones'),
+        centerTitle: true,
+        backgroundColor: Colors.blue,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.logout_outlined),
+
           onPressed: () => Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (_) => const LoginPage()),
           ),
         ),
-        centerTitle: true,
-        backgroundColor: Colors.blue,
-
         actions: [
           IconButton(
             onPressed: () async {
               final result = await Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => CreateDataWordspace()),
+                MaterialPageRoute(builder: (_) => CreateNameWordspace()),
               );
               if (result == true) {
                 loadData();
@@ -97,6 +70,19 @@ class _WordspacePageState extends State<WordspacePage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
+            TextField(
+              controller: searchController,
+              style: const TextStyle(fontSize: 15),
+              decoration: InputDecoration(
+                hintText: 'Buscar',
+                hintStyle: TextStyle(color: Colors.grey[400]),
+                prefixIcon: const Icon(
+                  Icons.search_rounded,
+                  color: Color(0xFF667eea),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
             Expanded(
               child: filterNote.isEmpty
                   ? const Center(child: Text("Sin datos"))

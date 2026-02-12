@@ -1,4 +1,3 @@
-import 'package:app/modules/authenticate/login/page/login_page.dart';
 import 'package:app/modules/authenticate/recovery_password/widget/reset_password.dart';
 import 'package:app/modules/home/page/home_page.dart';
 import 'package:app/shared/helpers/global_helper.dart';
