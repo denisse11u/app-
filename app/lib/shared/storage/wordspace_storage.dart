@@ -63,4 +63,28 @@ class WordspaceStorage {
   //   GlobalHelper.logger.w('versionApp: $versionApp');
   //   return versionApp;
   // }
+
+  Future<void> saveWordspace(WordspaceModel wordspace) async {
+    final jsonString = wordspaceModelToJson(wordspace);
+    await storage.write(key: 'wordspace_data', value: jsonString);
+  }
+
+  Future<WordspaceModel?> getWordspace() async {
+    final jsonString = await storage.read(key: 'wordspace_data');
+
+    if (jsonString == null) {
+      return null;
+    }
+
+    return wordspaceModelFromJson(jsonString);
+  }
+
+  Future<void> deleteWordspace() async {
+    await storage.delete(key: 'wordspace_data');
+  }
+
+  Future<bool> hasWordspace() async {
+    final data = await getWordspace();
+    return data != null;
+  }
 }

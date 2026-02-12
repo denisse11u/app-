@@ -37,6 +37,7 @@ class Credential {
   final String password;
   final String url;
   final String notes;
+  final String? imageBase64;
 
   Credential({
     required this.name,
@@ -44,6 +45,7 @@ class Credential {
     required this.password,
     required this.url,
     required this.notes,
+    this.imageBase64,
   });
 
   factory Credential.fromJson(Map<String, dynamic> json) => Credential(
@@ -52,6 +54,7 @@ class Credential {
     password: json["password"],
     url: json["url"],
     notes: json["notes"],
+    imageBase64: json["imageBase64"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -60,5 +63,6 @@ class Credential {
     "password": password,
     "url": url,
     "notes": notes,
+    "imageBase64": imageBase64,
   };
 }
