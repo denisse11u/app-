@@ -90,6 +90,27 @@ class WordspaceStorage {
     await saveAllWordspaces(wordspaces);
   }
 
+  Future<void> updateWordspace(
+    int wordspaceId,
+    WordspaceModel updatedWordspace,
+  ) async {
+    List<WordspaceModel> wordspaces = await getAllWordspaces();
+
+    int index = wordspaces.indexWhere((w) => w.id == wordspaceId);
+    if (index == -1) return;
+
+    wordspaces[index] = updatedWordspace;
+
+    wordspaces[index] = WordspaceModel(
+      id: wordspaces[index].id,
+      name: wordspaces[index].name,
+      description: wordspaces[index].description,
+      credentials: [],
+    );
+
+    await saveAllWordspaces(wordspaces);
+  }
+
   Future<void> deleteCredential(int wordspaceId, int credentialIndex) async {
     List<WordspaceModel> wordspaces = await getAllWordspaces();
 
@@ -106,6 +127,16 @@ class WordspaceStorage {
       credentials: credentials,
     );
 
+    await saveAllWordspaces(wordspaces);
+  }
+
+  Future<void> deleteWordspace(int wordspaceId) async {
+    List<WordspaceModel> wordspaces = await getAllWordspaces();
+
+    int index = wordspaces.indexWhere((w) => w.id == wordspaceId);
+    if (index == -1) return;
+
+    wordspaces.removeAt(index);
     await saveAllWordspaces(wordspaces);
   }
 }

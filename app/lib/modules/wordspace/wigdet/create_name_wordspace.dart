@@ -318,25 +318,41 @@
 // //                 child: Text('data'),
 // //               ),
 
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:app/models/wordspace_model.dart';
-import 'package:app/modules/home/page/home_page.dart';
 import 'package:app/shared/storage/wordspace_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class CreateNameWordspace extends StatefulWidget {
   final int wordspaceId;
+  final int? credentialIndex;
 
-  const CreateNameWordspace({super.key, required this.wordspaceId});
+  final WordspaceModel? wordspace;
+
+  const CreateNameWordspace({
+    super.key,
+    required this.wordspaceId,
+    this.wordspace,
+    this.credentialIndex,
+  });
 
   @override
-  State<CreateNameWordspace> createState() => _ListWordspaceState();
+  State<CreateNameWordspace> createState() => _CreateNameWordspaceState();
 }
 
-class _ListWordspaceState extends State<CreateNameWordspace> {
+class _CreateNameWordspaceState extends State<CreateNameWordspace> {
+  @override
+  void initState() {
+    if (widget.wordspace != null) {
+      name = TextEditingController(text: widget.wordspace!.name);
+    } else {
+      name = TextEditingController();
+    }
+    super.initState();
+  }
+
   @override
   void dispose() {
     name.dispose();
@@ -344,13 +360,13 @@ class _ListWordspaceState extends State<CreateNameWordspace> {
     super.dispose();
   }
 
+  late TextEditingController name;
+
   File? image;
   final picker = ImagePicker();
   final _formKey = GlobalKey<FormState>();
 
   final storage = WordspaceStorage();
-
-  final name = TextEditingController();
 
   Future<void> pickImage() async {
     final picked = await picker.pickImage(source: ImageSource.gallery);
@@ -427,14 +443,32 @@ class _ListWordspaceState extends State<CreateNameWordspace> {
                       credentials: [],
                     ),
                   );
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (_) => HomePage()),
+
+                  final wordspace = WordspaceModel(
+                    name: name.text.trim(),
+                    description: '',
+                    credentials: [],
+                    id: 0,
                   );
+
+                  if (widget.wordspace == null) {
+                    await storage.saveAllWordspaces([...wordspaces, wordspace]);
+                  } else {
+                    await storage.updateWordspace(
+                      widget.wordspaceId,
+                      WordspaceModel(
+                        name: name.text.trim(),
+                        description: widget.wordspace!.description,
+                        credentials: widget.wordspace!.credentials,
+                        id: widget.wordspaceId,
+                      ),
+                    );
+                  }
+
+                  Navigator.pop(context, true);
                 },
-                child: const Text(
-                  'GUARDAR',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                child: Text(
+                  widget.wordspace == null ? "Guardar" : "Actualizar",
                 ),
               ),
             ],

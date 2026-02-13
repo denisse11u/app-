@@ -12,11 +12,12 @@ class GlobalHelper {
     final snackBar = SnackBar(
       backgroundColor: colorSnackBar,
       content: Text(message),
-      action: SnackBarAction(
-        textColor: Colors.white,
-        label: 'Cerrar',
-        onPressed: () {},
-      ),
+      duration: Duration(seconds: 2),
+      // action: SnackBarAction(
+      //   textColor: Colors.white,
+      //   label: 'Cerrar',
+      //   onPressed: () {},
+      // ),
     );
 
     return ScaffoldMessenger.of(context).showSnackBar(snackBar);

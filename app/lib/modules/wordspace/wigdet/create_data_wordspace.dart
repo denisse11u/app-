@@ -328,7 +328,14 @@ import 'package:image_picker/image_picker.dart';
 
 class CreateDataWordspace extends StatefulWidget {
   final int wordspaceId;
-  const CreateDataWordspace({super.key, required this.wordspaceId});
+  final int? credentialIndex;
+  final Credential? credential;
+  const CreateDataWordspace({
+    super.key,
+    required this.wordspaceId,
+    required this.credentialIndex,
+    this.credential,
+  });
 
   @override
   State<CreateDataWordspace> createState() => _CreateWordspaceState();
@@ -336,14 +343,40 @@ class CreateDataWordspace extends StatefulWidget {
 
 class _CreateWordspaceState extends State<CreateDataWordspace> {
   @override
+  void initState() {
+    super.initState();
+
+    if (widget.credential != null) {
+      name = TextEditingController(text: widget.credential!.name);
+      user = TextEditingController(text: widget.credential!.user);
+      pass = TextEditingController(text: widget.credential!.password);
+      url = TextEditingController(text: widget.credential!.url);
+      notes = TextEditingController(text: widget.credential!.notes);
+    } else {
+      name = TextEditingController();
+      user = TextEditingController();
+      pass = TextEditingController();
+      url = TextEditingController();
+      notes = TextEditingController();
+    }
+  }
+
+  @override
   void dispose() {
     name.dispose();
     user.dispose();
     pass.dispose();
     url.dispose();
     notes.dispose();
+
     super.dispose();
   }
+
+  late TextEditingController name;
+  late TextEditingController user;
+  late TextEditingController pass;
+  late TextEditingController url;
+  late TextEditingController notes;
 
   File? image;
   final picker = ImagePicker();
@@ -351,12 +384,12 @@ class _CreateWordspaceState extends State<CreateDataWordspace> {
 
   final storage = WordspaceStorage();
 
-  final name = TextEditingController();
-  final user = TextEditingController();
-  final email = TextEditingController();
-  final url = TextEditingController();
-  final pass = TextEditingController();
-  final notes = TextEditingController();
+  // final name = TextEditingController();
+  // final user = TextEditingController();
+  // final email = TextEditingController();
+  // final url = TextEditingController();
+  // final pass = TextEditingController();
+  // final notes = TextEditingController();
 
   Future<void> pickImage() async {
     final picked = await picker.pickImage(source: ImageSource.gallery);
@@ -422,7 +455,7 @@ class _CreateWordspaceState extends State<CreateDataWordspace> {
                     SizedBox(height: 24),
                     TextFormField(
                       controller: notes,
-                      maxLines: 10,
+                      // maxLines: 10,
                       decoration: InputDecoration(labelText: "Notas"),
                       validator: (value) => null,
                     ),
@@ -432,28 +465,41 @@ class _CreateWordspaceState extends State<CreateDataWordspace> {
               SizedBox(height: 24),
               ElevatedButton(
                 onPressed: () async {
+                  if (!_formKey.currentState!.validate()) return;
+
                   String? imageBase64;
                   if (image != null) {
                     final bytes = await image!.readAsBytes();
                     imageBase64 = base64Encode(bytes);
                   }
 
-                  await storage.saveCredential(
-                    widget.wordspaceId,
-                    Credential(
-                      name: name.text.trim(),
-                      user: user.text.trim(),
-                      password: pass.text.trim(),
-                      url: url.text.trim(),
-                      notes: notes.text.trim(),
-                      imageBase64: imageBase64,
-                    ),
+                  final credential = Credential(
+                    name: name.text.trim(),
+                    user: user.text.trim(),
+                    password: pass.text.trim(),
+                    url: url.text.trim(),
+                    notes: notes.text.trim(),
+                    imageBase64: imageBase64,
+                    // imageBase64: image != null ? base64Encode(await image!.readAsBytes()) : null,
                   );
+
+                  if (widget.credential == null) {
+                    await storage.saveCredential(
+                      widget.wordspaceId,
+                      credential,
+                    );
+                  } else {
+                    await storage.updateCredential(
+                      widget.wordspaceId,
+                      widget.credentialIndex!,
+                      credential,
+                    );
+                  }
+
                   Navigator.pop(context, true);
                 },
-                child: const Text(
-                  'GUARDAR',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                child: Text(
+                  widget.credential == null ? "Guardar" : "Actualizar",
                 ),
               ),
             ],

@@ -613,8 +613,8 @@
 // // }
 
 import 'package:app/models/wordspace_model.dart';
-import 'package:app/modules/wordspace/wigdet/create_data_wordspace.dart'
-    show CreateDataWordspace;
+import 'package:app/modules/wordspace/wigdet/create_data_wordspace.dart';
+import 'package:app/shared/helpers/global_helper.dart';
 import 'package:app/shared/storage/wordspace_storage.dart';
 import 'package:flutter/material.dart';
 
@@ -628,6 +628,7 @@ class WordspacePage extends StatefulWidget {
 
 class _WordspacePageState extends State<WordspacePage> {
   List<Credential> filterNote = [];
+  final GlobalKey<FormState> keyForm = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -640,18 +641,20 @@ class _WordspacePageState extends State<WordspacePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.wordspace.name),
+        centerTitle: true,
         actions: [
           IconButton(
             onPressed: () async {
               final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) =>
-                      CreateDataWordspace(wordspaceId: widget.wordspace.id),
+                  builder: (_) => CreateDataWordspace(
+                    wordspaceId: widget.wordspace.id,
+                    credentialIndex: 0,
+                  ),
                 ),
               );
               if (result == true) {
-                // Recargar datos
                 List<WordspaceModel> wordspaces = await WordspaceStorage()
                     .getAllWordspaces();
                 WordspaceModel? updated = wordspaces.firstWhere(
@@ -668,20 +671,125 @@ class _WordspacePageState extends State<WordspacePage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: filterNote.isEmpty
-            ? const Center(child: Text("Sin conexiones"))
-            : ListView.builder(
-                itemCount: filterNote.length,
-                itemBuilder: (context, index) {
-                  final c = filterNote[index];
-                  return Card(
-                    child: ListTile(
-                      title: Text(c.name),
-                      subtitle: Text(c.user),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              "lista de conexiones",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            Expanded(
+              child: filterNote.isEmpty
+                  ? const Center(child: Text("Sin conexiones"))
+                  : ListView.builder(
+                      itemCount: filterNote.length,
+                      itemBuilder: (context, index) {
+                        final c = filterNote[index];
+                        return Card(
+                          child: ListTile(
+                            title: Text(c.name),
+                            subtitle: Text(c.user),
+
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+
+                              children: [
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.delete,
+                                    color: Colors.red,
+                                  ),
+
+                                  onPressed: () async {
+                                    final confirm = await showDialog<bool>(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: const Text(
+                                            "Confirmar eliminación",
+                                          ),
+                                          content: const Text(
+                                            "¿Estás seguro de eliminar esta conexión?",
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              child: const Text("Cancelar"),
+                                              onPressed: () => Navigator.of(
+                                                context,
+                                              ).pop(false),
+                                            ),
+                                            TextButton(
+                                              child: const Text("Eliminar"),
+                                              onPressed: () => Navigator.of(
+                                                context,
+                                              ).pop(true),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+
+                                    if (confirm == true) {
+                                      await WordspaceStorage().deleteCredential(
+                                        widget.wordspace.id,
+                                        index,
+                                      );
+
+                                      setState(() {
+                                        filterNote.removeAt(index);
+                                      });
+
+                                      GlobalHelper.showSuccess(
+                                        context,
+                                        'Conexión eliminada',
+                                      );
+                                    }
+                                    SizedBox(width: 22);
+                                  },
+                                ),
+
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.edit_document,
+                                    color: Colors.black,
+                                  ),
+
+                                  onPressed: () async {
+                                    final result = await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => CreateDataWordspace(
+                                          wordspaceId: widget.wordspace.id,
+                                          credentialIndex: index,
+                                          credential: filterNote[index],
+                                        ),
+                                      ),
+                                    );
+
+                                    if (result == true) {
+                                      List<WordspaceModel> wordspaces =
+                                          await WordspaceStorage()
+                                              .getAllWordspaces();
+                                      WordspaceModel? updated = wordspaces
+                                          .firstWhere(
+                                            (w) => w.id == widget.wordspace.id,
+                                          );
+                                      setState(() {
+                                        filterNote = updated.credentials;
+                                      });
+                                    }
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
+            ),
+          ],
+        ),
       ),
     );
   }
