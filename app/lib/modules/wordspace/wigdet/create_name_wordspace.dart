@@ -318,6 +318,7 @@
 // //                 child: Text('data'),
 // //               ),
 
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:app/models/wordspace_model.dart';
@@ -426,42 +427,68 @@ class _CreateNameWordspaceState extends State<CreateNameWordspace> {
               SizedBox(height: 24),
               ElevatedButton(
                 onPressed: () async {
-                  List<WordspaceModel> wordspaces = await storage
-                      .getAllWordspaces();
-                  int newId = wordspaces.isEmpty
-                      ? 1
-                      : wordspaces
-                                .map((w) => w.id)
-                                .reduce((a, b) => a > b ? a : b) +
-                            1;
+                  // List<WordspaceModel> wordspaces = await storage
+                  //     .getAllWordspaces();
+                  // int newId = wordspaces.isEmpty
+                  //     ? 1
+                  //     : wordspaces
+                  //               .map((w) => w.id)
+                  //               .reduce((a, b) => a > b ? a : b) +
+                  //           1;
 
-                  await storage.addWordspace(
-                    WordspaceModel(
-                      id: newId,
-                      name: name.text.trim(),
-                      description: '',
-                      credentials: [],
-                    ),
-                  );
+                  // await storage.addWordspace(
+                  //   WordspaceModel(
+                  //     id: newId,
+                  //     name: name.text.trim(),
+                  //     description: '',
+                  //     credentials: [],
+                  //   ),
+                  // );
+
+                  // final wordspace = WordspaceModel(
+                  //   name: name.text.trim(),
+                  //   description: '',
+                  //   credentials: [],
+                  //   id: 0,
+                  // );
+
+                  //  if (widget.wordspace == null) {
+                  //   await storage.saveAllWordspaces(
+                  //     widget.wordspaceId,
+
+                  //   );
+                  // } else {
+                  //   await storage.updateCredential(
+                  //     widget.wordspaceId,
+                  //     widget.credentialIndex!,
+                  //     credential,
+                  //   );
+                  // }
+
+                  if (!_formKey.currentState!.validate()) return;
+
+                  String? imageBase64;
+                  if (image != null) {
+                    final bytes = await image!.readAsBytes();
+                    imageBase64 = base64Encode(bytes);
+                  }
 
                   final wordspace = WordspaceModel(
                     name: name.text.trim(),
                     description: '',
                     credentials: [],
                     id: 0,
+
+                    // imageBase64: imageBase64,
+                    // imageBase64: image != null ? base64Encode(await image!.readAsBytes()) : null,
                   );
 
                   if (widget.wordspace == null) {
-                    await storage.saveAllWordspaces([...wordspaces, wordspace]);
+                    await storage.addWordspace(wordspace);
                   } else {
                     await storage.updateWordspace(
                       widget.wordspaceId,
-                      WordspaceModel(
-                        name: name.text.trim(),
-                        description: widget.wordspace!.description,
-                        credentials: widget.wordspace!.credentials,
-                        id: widget.wordspaceId,
-                      ),
+                      wordspace,
                     );
                   }
 
