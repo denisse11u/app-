@@ -56,7 +56,9 @@ class _WordspacePageState extends State<WordspacePage> {
             onPressed: () async {
               final result = await Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => CreateNameWordspace()),
+                MaterialPageRoute(
+                  builder: (_) => CreateNameWordspace(wordspaceId: 0),
+                ),
               );
               if (result == true) {
                 loadData();
@@ -98,7 +100,8 @@ class _WordspacePageState extends State<WordspacePage> {
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => CreateNameWordspace(),
+                                  builder: (_) =>
+                                      CreateNameWordspace(wordspaceId: 0),
                                 ),
                               ),
                             },

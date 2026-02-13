@@ -30,11 +30,19 @@ class _HomePageState extends State<HomePage> {
 
   List<WordspaceModel> filterWordspaces = [];
 
+  // Future<void> loadData() async {
+  //   wordspace = await WordspaceStorage().getUserSpaceData();
+  //   setState(() {
+  //     filterNote = wordspace?.credentials ?? [];
+  //     isLoading = false;
+  //   });
+  // }
+
   Future<void> loadData() async {
-    wordspace = await WordspaceStorage().getUserSpaceData();
+    List<WordspaceModel> wordspaces = await WordspaceStorage()
+        .getAllWordspaces();
     setState(() {
-      wordspace = wordspace;
-      filterNote = wordspace?.credentials ?? [];
+      filterWordspaces = wordspaces;
       isLoading = false;
     });
   }
@@ -59,7 +67,10 @@ class _HomePageState extends State<HomePage> {
             onPressed: () async {
               final result = await Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => CreateNameWordspace()),
+
+                MaterialPageRoute(
+                  builder: (_) => CreateNameWordspace(wordspaceId: 0),
+                ),
               );
               if (result == true) {
                 loadData();
@@ -86,24 +97,53 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             const SizedBox(height: 20),
+
+            // Expanded(
+            //   child: filterNote.isEmpty
+            //       ? const Center(child: Text("Sin datos"))
+            //       : ListView.builder(
+            //           itemCount: filterNote.length,
+            //           itemBuilder: (context, index) {
+            //             final c = filterNote[index];
+            //             return Card(
+            //               margin: const EdgeInsets.only(top: 12),
+            //               child: GestureDetector(
+            //                 child: ListTile(title: Text(c.name)),
+            //                 onTap: () => {
+            //                   Navigator.pushReplacement(
+            //                     context,
+            //                     MaterialPageRoute(
+            //                       builder: (_) => const WordspacePage(wordspace: wordspace),
+            //                     ),
+            //                   ),
+            //                 },
+            //               ),
+            //             );
+            //           },
+            //         ),
             Expanded(
-              child: filterNote.isEmpty
-                  ? const Center(child: Text("Sin datos"))
+              child: filterWordspaces.isEmpty
+                  ? const Center(child: Text("Sin baúles"))
                   : ListView.builder(
-                      itemCount: filterNote.length,
+                      itemCount: filterWordspaces.length,
                       itemBuilder: (context, index) {
-                        final c = filterNote[index];
+                        final wordspace = filterWordspaces[index];
                         return Card(
                           margin: const EdgeInsets.only(top: 12),
-                          child: GestureDetector(
-                            child: ListTile(title: Text(c.name)),
-                            onTap: () => {
-                              Navigator.pushReplacement(
+                          child: ListTile(
+                            title: Text(wordspace.name),
+                            subtitle: Text(
+                              '${wordspace.credentials.length} conexiones',
+                            ),
+                            onTap: () async {
+                              final result = await Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => const WordspacePage(),
+                                  builder: (_) =>
+                                      WordspacePage(wordspace: wordspace),
                                 ),
-                              ),
+                              );
+                              if (result == true) loadData();
                             },
                           ),
                         );

@@ -1,7 +1,5 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:app/models/wordspace_model.dart';
-import 'package:app/shared/helpers/global_helper.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class WordspaceStorage {
@@ -9,154 +7,105 @@ class WordspaceStorage {
       const AndroidOptions(encryptedSharedPreferences: true);
   final storage = FlutterSecureStorage(aOptions: _getAndroidOptions());
 
+  Future<List<WordspaceModel>> getAllWordspaces() async {
+    final jsonString = await storage.read(key: 'userData');
+    if (jsonString == null) return [];
+
+    try {
+      final decoded = jsonDecode(jsonString);
+      if (decoded is List) {
+        return decoded.map((item) => WordspaceModel.fromJson(item)).toList();
+      }
+      if (decoded is Map<String, dynamic>) {
+        return [WordspaceModel.fromJson(decoded)];
+      }
+      return [];
+    } catch (e) {
+      return [];
+    }
+  }
+
   Future<WordspaceModel?> getUserSpaceData() async {
-    // final versionAppStorage = await Userstorage().getVersionApp();
-    // if (VersionApp.versionApp != versionAppStorage) return null;
     final data = await storage.read(key: 'userData');
     if (data != null) {
-      WordspaceModel response = wordspaceModelFromJson(data);
-      GlobalHelper.logger.w('Datos leídos de secure storage: $data');
-      return response;
+      try {
+        final decoded = jsonDecode(data);
+        if (decoded is Map<String, dynamic>) {
+          return WordspaceModel.fromJson(decoded);
+        }
+      } catch (e) {
+        return null;
+      }
     }
     return null;
   }
 
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  setUserSpaceData(WordspaceModel wordspaceModel) async {
-    // setVersionApp(VersionApp.versionApp);
-    final data = jsonEncode(wordspaceModel);
-    GlobalHelper.logger.w('Guardando datos en secure storage: $data');
-    await storage.write(key: 'userData', value: data);
-  }
-
-  // removeDataLogin() async {
-  //   await storage.delete(key: 'userData');
-  // }
-
-  // setVersionApp(String versionApp) async {
-  //   await storage.write(key: 'versionApp', value: versionApp);
-  // }
-
-  // Future<String?> getVersionApp() async {
-  //   final versionApp = await storage.read(key: 'versionApp');
-  //   GlobalHelper.logger.w('versionApp: $versionApp');
-  //   return versionApp;
-  // }
-  // ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  // setDataName(WordspaceModel wordspaceModel) async {
-  //   setVersionApp(VersionApp.versionApp);
-  //   final data = jsonEncode(wordspaceModel);
-  //   GlobalHelper.logger.w('Guardando datos en secure storage: $data');
-  //   await storage.write(key: 'userData', value: data);
-  // }
-
-  // removeDataLogin() async {
-  //   await storage.delete(key: 'userData');
-  // }
-
-  // setVersionApp(String versionApp) async {
-  //   await storage.write(key: 'versionApp', value: versionApp);
-  // }
-
-  // Future<String?> getVersionApp() async {
-  //   final versionApp = await storage.read(key: 'versionApp');
-  //   GlobalHelper.logger.w('versionApp: $versionApp');
-  //   return versionApp;
-  // }
-
-  Future<void> saveWordspace(WordspaceModel wordspace) async {
-    final jsonString = wordspaceModelToJson(wordspace);
+  Future<void> saveAllWordspaces(List<WordspaceModel> wordspaces) async {
+    final jsonString = jsonEncode(wordspaces);
     await storage.write(key: 'userData', value: jsonString);
   }
 
-  Future<void> saveCredential(Credential credential, File? image) async {
-    try {
-      // Get existing wordspace data
-      WordspaceModel? currentWordspace = await getWordspace();
-
-      // If no wordspace exists, create a new one
-      if (currentWordspace == null) {
-        currentWordspace = WordspaceModel(
-          name: 'Mi Baúl',
-          description: 'Mis conexiones seguras',
-          credentials: [],
-          id: 0,
-        );
-      }
-
-      // Add the new credential to the list
-      final updatedCredentials = [...currentWordspace.credentials, credential];
-
-      // Create updated wordspace
-      final updatedWordspace = WordspaceModel(
-        name: currentWordspace.name,
-        description: currentWordspace.description,
-        credentials: updatedCredentials,
-        id: currentWordspace.id,
-      );
-
-      // Save to storage
-      await saveWordspace(updatedWordspace);
-    } catch (e) {
-      throw Exception('Error guardando credencial: $e');
-    }
+  Future<void> addWordspace(WordspaceModel wordspace) async {
+    List<WordspaceModel> wordspaces = await getAllWordspaces();
+    wordspaces.add(wordspace);
+    await saveAllWordspaces(wordspaces);
   }
 
-  Future<WordspaceModel?> getWordspace() async {
-    final jsonString = await storage.read(key: 'userData');
+  Future<void> saveCredential(int wordspaceId, Credential credential) async {
+    List<WordspaceModel> wordspaces = await getAllWordspaces();
 
-    if (jsonString == null) {
-      return null;
-    }
+    int index = wordspaces.indexWhere((w) => w.id == wordspaceId);
+    if (index == -1) return;
 
-    return wordspaceModelFromJson(jsonString);
+    wordspaces[index] = WordspaceModel(
+      id: wordspaces[index].id,
+      name: wordspaces[index].name,
+      description: wordspaces[index].description,
+      credentials: [...wordspaces[index].credentials, credential],
+    );
+
+    await saveAllWordspaces(wordspaces);
   }
 
-  Future<void> deleteWordspace() async {
-    await storage.delete(key: 'userData');
-  }
-
-  Future<bool> hasWordspace() async {
-    final data = await getWordspace();
-    return data != null;
-  }
-
-  //actualizar
-  Future<WordspaceModel?> updateWordspace(
-    int id,
-    WordspaceModel wordspace,
+  Future<void> updateCredential(
+    int wordspaceId,
+    int credentialIndex,
+    Credential credential,
   ) async {
-    try {
-      final jsonString = await storage.read(key: 'userData');
+    List<WordspaceModel> wordspaces = await getAllWordspaces();
 
-      if (jsonString == null) return null;
-      final List<WordspaceModel> list = wordspaceModelListFromJson(jsonString);
-      int index = list.indexWhere((item) => item.id == id);
-      if (index == -1) return null;
-      list[index] = wordspace;
-      final updatedJsonString = jsonEncode(list);
-      await storage.write(key: 'userData', value: updatedJsonString);
-      return wordspace;
-    } catch (e) {
-      throw Exception('Error de conexión');
-    }
+    int index = wordspaces.indexWhere((w) => w.id == wordspaceId);
+    if (index == -1) return;
+
+    List<Credential> credentials = [...wordspaces[index].credentials];
+    credentials[credentialIndex] = credential;
+
+    wordspaces[index] = WordspaceModel(
+      id: wordspaces[index].id,
+      name: wordspaces[index].name,
+      description: wordspaces[index].description,
+      credentials: credentials,
+    );
+
+    await saveAllWordspaces(wordspaces);
   }
 
-  List<WordspaceModel> wordspaceModelListFromJson(String id) {
-    final jsonData = jsonDecode(id) as List;
-    return jsonData
-        .map((item) => WordspaceModel.fromJson(item as Map<String, dynamic>))
-        .toList();
+  Future<void> deleteCredential(int wordspaceId, int credentialIndex) async {
+    List<WordspaceModel> wordspaces = await getAllWordspaces();
+
+    int index = wordspaces.indexWhere((w) => w.id == wordspaceId);
+    if (index == -1) return;
+
+    List<Credential> credentials = [...wordspaces[index].credentials];
+    credentials.removeAt(credentialIndex);
+
+    wordspaces[index] = WordspaceModel(
+      id: wordspaces[index].id,
+      name: wordspaces[index].name,
+      description: wordspaces[index].description,
+      credentials: credentials,
+    );
+
+    await saveAllWordspaces(wordspaces);
   }
 }
-
-
-
-  // final jsonString = await storage.read(key: 'wordspace_data');
-
-    // if (jsonString == null) {
-    //   return null;
-    // }
-
-    // return wordspaceModelFromJson(jsonString);

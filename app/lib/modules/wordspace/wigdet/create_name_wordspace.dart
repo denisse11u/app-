@@ -318,6 +318,7 @@
 // //                 child: Text('data'),
 // //               ),
 
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:app/models/wordspace_model.dart';
@@ -327,7 +328,9 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class CreateNameWordspace extends StatefulWidget {
-  const CreateNameWordspace({super.key});
+  final int wordspaceId;
+
+  const CreateNameWordspace({super.key, required this.wordspaceId});
 
   @override
   State<CreateNameWordspace> createState() => _ListWordspaceState();
@@ -407,15 +410,22 @@ class _ListWordspaceState extends State<CreateNameWordspace> {
               SizedBox(height: 24),
               ElevatedButton(
                 onPressed: () async {
-                  await storage.saveCredential(
-                    Credential(
+                  List<WordspaceModel> wordspaces = await storage
+                      .getAllWordspaces();
+                  int newId = wordspaces.isEmpty
+                      ? 1
+                      : wordspaces
+                                .map((w) => w.id)
+                                .reduce((a, b) => a > b ? a : b) +
+                            1;
+
+                  await storage.addWordspace(
+                    WordspaceModel(
+                      id: newId,
                       name: name.text.trim(),
-                      user: '',
-                      password: '',
-                      url: '',
-                      notes: '',
+                      description: '',
+                      credentials: [],
                     ),
-                    image,
                   );
                   Navigator.pushReplacement(
                     context,
