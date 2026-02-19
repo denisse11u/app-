@@ -67,25 +67,12 @@ class _ResetPasswordState extends State<ResetPassword> {
                           MaterialPageRoute(builder: (_) => const HomePage()),
                         );
                         return;
-                      } //
-
-                      // if (savedWord == null) {
-                      //   if (!mounted) return;
-                      //   GlobalHelper.showError(
-                      //     context,
-                      //     'No hay palabra registrada',
-                      //   );
-                      //   return;
-                      // }
+                      }
 
                       if (controller.text.trim() == savedWord) {
                         await storage.deletePin();
 
                         if (!mounted) return;
-                        // GlobalHelper.showSuccess(
-                        //   context,
-                        //   'Palabra correcta, crea un nuevo PIN',
-                        // );
 
                         Navigator.pushReplacement(
                           context,
@@ -102,32 +89,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                     child: const Text('Guardar'),
                   ),
 
-                  //   FilledButton(text: 'Iniciar Sesión', onPressed: (){
-                  //     if (keyForm.currentState!.validate()) {
-                  //         _tryLogin();
-                  //       }
-                  // },)
-                  // ElevatedButton(
-                  //   onPressed: () {
-                  //     if (keyForm.currentState!.validate()) {
-                  //       return GlobalHelper.showSuccess(context, 'guardado exitosamente');
-                  //     }
-                  //   },
-                  //   child: const Text('Submit'),
-                  // ),
                   const SizedBox(height: 20),
-
-                  // TextButton(
-                  //   onPressed: () {
-                  //     Navigator.pushReplacement(
-                  //       context,
-                  //       MaterialPageRoute(
-                  //         builder: (_) => const ForgotPassword(),
-                  //       ),
-                  //     );
-                  //   },
-                  //   child: const Text('¿Olvidaste tu contraseña?'),
-                  // ),
                 ],
               ),
             ),
